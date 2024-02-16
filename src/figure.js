@@ -51,16 +51,14 @@ export class Figure {
     return new Figure(-this.value)
   }
 
-  mod(n) {
-    if (type(n) !== 'number' || isNaN(n))
-      throw TypeError('The argument must be a valie number.')
-    return new Figure(this.value % n)
+  mod(arg) {
+    const f = new Figure(arg)
+    return new Figure(this.value % f.value)
   }
 
-  pow(n) {
-    if (type(n) !== 'number' || isNaN(n))
-      throw TypeError('The argument must be a valie number.')
-    return new Figure(Math.pow(this.value, n))
+  pow(arg) {
+    const f = new Figure(arg)
+    return new Figure(Math.pow(this.value, f.value))
   }
 
   eq(arg) {

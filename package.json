@@ -1,6 +1,6 @@
 {
   "name": "@mopsite/algebra",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A small, fast, easy-to-use library for primary mathematics.",
   "main": "dist/algebra.js",
   "browser": "dist/algebra.js",
