@@ -1,0 +1,53 @@
+{
+  "name": "@mopsite/algebra",
+  "version": "1.0.0",
+  "description": "A small, fast, easy-to-use library for primary mathematics.",
+  "main": "dist/algebra.js",
+  "browser": "dist/algebra.js",
+  "module": "dist/algebra.esm.js",
+  "type": "module",
+  "files": [
+    "dist/",
+    "LICENCE",
+    "README.md",
+    "package.json"
+  ],
+  "keywords": [
+    "algebra",
+    "number",
+    "decimal",
+    "operation"
+  ],
+  "author": {
+    "name": "Paul",
+    "email": "37662788@qq.com"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mopsite/algebra.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mopsite/algebra.git/issues"
+  },
+  "babel": {
+    "presets": [
+      "@babel/preset-env"
+    ]
+  },
+  "unpkg": "dist/",
+  "scripts": {
+    "build": "rm -rf dist && rollup -c"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.9",
+    "@babel/preset-env": "^7.23.9",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-terser": "^0.4.4",
+    "rollup": "^4.10.0"
+  }
+}
