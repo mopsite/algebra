@@ -108,6 +108,7 @@ export class Figure {
 
   div(arg) {
     const f = new Figure(arg)
+    if (f.value === 0) throw TypeError('Divide by zero.')
     const m = f.decimals - this.decimals
     const s1 = this.value.toString().replace('.', '')
     const s2 = f.value.toString().replace('.', '')
