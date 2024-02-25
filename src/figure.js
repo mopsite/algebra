@@ -1,46 +1,112 @@
-import { type } from './helps.js'
+import { type, random } from './helps/index.js'
 
 export class Figure {
+  #value
+  #decimals
+  #sign
+
   constructor(arg) {
+    let value = 0
     switch (type(arg)) {
-      case 'number':
-        if (isNaN(arg)) throw TypeError('Need a valid number.')
-        this.value = arg
+      case 'Number':
+        value = isNaN(arg) ? value : arg
         break
-      case 'string':
-        this.value = Number(arg)
-        if (isNaN(this.value))
-          throw TypeError('The string value is not a valid number.')
+      case 'String':
+        value = isNaN(Number(arg)) ? arg.length : Number(arg)
         break
-      case 'array':
-        this.value = arg.length
+      case 'Boolean':
+        value = Number(arg)
         break
-      case 'object':
-        if (arg instanceof Figure) {
-          this.value = arg.value
-        } else if (arg.toFigure) {
-          this.value = new Figure(arg.toFigure()).value
-        } else {
-          throw TypeError(
-            'The object must be a instance of Figure, or have a toFigure method which is return a value conform to Figure.'
-          )
-        }
+      case 'Array':
+        value = isNaN(Number(arg)) ? arg.length : Number(arg)
         break
-      default:
-        throw TypeError(
-          'The Figure constructor needs a argument which is a number/string/array, a instance of Figure, or a object which have a toFigure method.'
-        )
+      case 'Object':
+        value = arg instanceof Figure ? arg.value : value
+        break
     }
 
     try {
-      this.decimals = this.value.toString().split('.')[1].length
+      this.#decimals = String(value).split('.')[1].length
     } catch (e) {
-      this.decimals = 0
+      this.#decimals = 0
     }
 
-    this.sign = Math.sign(this.value)
+    this.#value = Number(String(Math.abs(value)).replace('.', ''))
 
-    Object.freeze(this)
+    this.#sign = Math.sign(value) === -0 ? 0 : Math.sign(value)
+  }
+
+  get value() {
+    return (this.#value * this.#sign) / 10 ** this.#decimals
+  }
+
+  set value(arg) {
+    const f = new Figure(arg)
+    this.#value = f.#value
+    this.#decimals = f.#decimals
+    this.#sign = f.#sign
+  }
+
+  static random(n1 = 0, n2 = 10, decimals = 0) {
+    let result
+    if (
+      Number.isInteger(n1) &&
+      Number.isInteger(n2) &&
+      Number.isInteger(decimals)
+    ) {
+      let intPart
+      let fraPart = '.'
+      decimals = decimals > 0 ? decimals : 0
+      intPart = n1 < n2 ? random(n1, n2) : random(n2, n1)
+      for (let i = 0; i < decimals - 1; i++) {
+        fraPart += random(0, 9)
+      }
+      fraPart += random(1, 9)
+      result = decimals > 0 ? intPart + fraPart : intPart
+      return new Figure(result)
+    } else {
+      throw new TypeError('The arguments must be integer number.')
+    }
+  }
+
+  add(arg) {
+    const f = new Figure(arg)
+    const r = Math.abs(this.#decimals - f.#decimals)
+    const m = Math.max(this.#decimals, f.#decimals)
+    const result =
+      this.#decimals > f.#decimals
+        ? (this.#value * this.#sign + f.#value * 10 ** r * f.#sign) / 10 ** m
+        : (this.#value * 10 ** r * this.#sign + f.#value * f.#sign) / 10 ** m
+    return new Figure(result)
+  }
+
+  sub(arg) {
+    const f = new Figure(arg)
+    f.value = -f.value
+    return this.add(f)
+  }
+
+  mul(arg) {
+    const f = new Figure(arg)
+    const m = this.#decimals + f.#decimals
+    const result = (this.#value * this.#sign * (f.#value * f.#sign)) / 10 ** m
+    return new Figure(result)
+  }
+
+  div(arg) {
+    const f = new Figure(arg)
+    if (f.#value === 0) throw new TypeError('Divide by zero.')
+    const m = f.#decimals - this.#decimals
+    const result = (this.#value * this.#sign) / (f.#value * f.#sign)
+    return new Figure(result).mul(10 ** m)
+  }
+
+  valueOf() {
+    return this.value
+  }
+
+  toString() {
+    return this.value + ''
   }
 
   abs() {
@@ -48,80 +114,50 @@ export class Figure {
   }
 
   neg() {
-    return new Figure(-this.value)
+    const f = new Figure(this)
+    f.#sign *= -1
+    return new Figure(f)
   }
 
   mod(arg) {
     const f = new Figure(arg)
-    return new Figure(this.value % f.value)
+    const r = Math.abs(this.#decimals - f.#decimals)
+    const m = Math.max(this.#decimals, f.#decimals)
+    const result =
+      this.#decimals > f.#decimals
+        ? (this.#value * this.#sign) % (f.#value * 10 ** r * f.#sign)
+        : (this.#value * 10 ** r * this.#sign) % (f.#value * f.#sign)
+    return new Figure(result / 10 ** m)
   }
 
-  pow(arg) {
-    const f = new Figure(arg)
-    return new Figure(Math.pow(this.value, f.value))
-  }
-
-  eq(arg) {
-    const f = new Figure(arg)
-    return this.value === f.value ? true : false
-  }
-
-  gt(arg) {
-    const f = new Figure(arg)
-    return this.value > f.value ? true : false
-  }
-
-  gte(arg) {
-    const f = new Figure(arg)
-    return this.value >= f.value ? true : false
-  }
-
-  lt(arg) {
-    const f = new Figure(arg)
-    return this.value < f.value ? true : false
-  }
-
-  lte(arg) {
-    const f = new Figure(arg)
-    return this.value <= f.value ? true : false
-  }
-
-  add(arg) {
-    const f = new Figure(arg)
-    const m = Math.pow(10, Math.max(this.decimals, f.decimals))
-    const result = (this.value * m + f.value * m) / m
-    return new Figure(result)
-  }
-
-  sub(arg) {
-    return this.add(-new Figure(arg).value)
-  }
-
-  mul(arg) {
-    const f = new Figure(arg)
-    const m = this.decimals + f.decimals
-    const s1 = this.value.toString().replace('.', '')
-    const s2 = f.value.toString().replace('.', '')
-    const result = (Number(s1) * Number(s2)) / Math.pow(10, m)
-    return new Figure(result)
-  }
-
-  div(arg) {
-    const f = new Figure(arg)
-    if (f.value === 0) throw TypeError('Divide by zero.')
-    const m = f.decimals - this.decimals
-    const s1 = this.value.toString().replace('.', '')
-    const s2 = f.value.toString().replace('.', '')
-    return new Figure(Number(s1) / Number(s2)).mul(Math.pow(10, m))
-  }
-
-  toString() {
-    return this.value + ''
+  pow(n) {
+    return new Figure(
+      (this.#value * this.#sign) ** n / 10 ** (this.#decimals * n)
+    )
   }
 
   toFixed(n) {
-    if ((type(n) !== 'number' || isNaN(n)) && (n > 100 || n < 0))
-      throw TypeError('The argument must be a number, and between 0 to 100.')
+    if (n < 0 || n > 100) throw new RangeError('The argument must be 0 to 100.')
     return new Figure(this.value.toFixed(n))
+  }
+
+  eq(arg) {
+    return this.value === new Figure(arg).value
+  }
+
+  gt(arg) {
+    return this.value > new Figure(arg).value ? true : false
+  }
+
+  gte(arg) {
+    return this.value >= new Figure(arg).value ? true : false
+  }
+
+  lt(arg) {
+    return this.value < new Figure(arg).value ? true : false
+  }
+
+  lte(arg) {
+    return this.value <= new Figure(arg).value ? true : false
   }
 }
