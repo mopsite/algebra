@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.1.1 / 2024-2-26
+
+- change build files
+
 ## 1.1.0 / 2024-2-25
 
 - fixed some bugs
