@@ -6,22 +6,22 @@ export default defineConfig({
   input: './index.js',
   output: [
     {
-      file: './dist/algebra.umd.js',
+      file: './dist/algebra.js',
       format: 'umd',
       name: 'algebra'
     },
     {
-      file: './dist/algebra.umd.min.js',
+      file: './dist/algebra.min.js',
       format: 'umd',
       name: 'algebra',
       plugins: [terser()]
     },
     {
-      file: './dist/algebra.esm.js',
+      file: './dist/algebra.mjs',
       format: 'es'
     },
     {
-      file: './dist/algebra.esm.min.js',
+      file: './dist/algebra.min.mjs',
       format: 'es',
       plugins: [terser()]
     }
