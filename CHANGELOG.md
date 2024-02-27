@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.1.4 / 2024-2-27
+
+- modify README.md
+
 ## 1.1.1 / 2024-2-26
 
 - change build files
